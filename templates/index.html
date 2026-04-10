@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deal Finder</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0f;--s1:#111118;--s2:#1a1a24;--s3:#22222e;--border:#2a2a3a;--text:#e2e2ea;--muted:#6b6b80;--accent:#6366f1;--accent2:#818cf8;--green:#22c55e;--red:#ef4444;--amber:#f59e0b;--blue:#3b82f6;--ggreen:#34d399;--radius:10px}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.app{display:grid;grid-template-columns:340px 1fr;grid-template-rows:56px 1fr 28px;height:100vh}
+header{grid-column:1/-1;background:var(--s1);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+.logo{font-weight:800;font-size:17px;display:flex;align-items:center;gap:8px}.logo span{color:var(--amber)}
+.header-right{display:flex;align-items:center;gap:12px}
+.sidebar{background:var(--s1);border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column}
+.panel{padding:16px;border-bottom:1px solid var(--border)}
+.panel-title{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);font-weight:700;margin-bottom:10px}
+label{font-size:12px;color:var(--muted);font-weight:500;display:block;margin-bottom:4px}
+input,select{width:100%;background:var(--s2);border:1px solid var(--border);color:var(--text);border-radius:var(--radius);padding:10px 12px;font-size:13px;font-family:inherit;transition:border .2s}
+input:focus,select:focus{outline:none;border-color:var(--accent)}
+input[type=number]{-moz-appearance:textfield}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.input-group{margin-bottom:10px}
+.btn{width:100%;padding:10px;border:none;border-radius:var(--radius);font-weight:700;font-size:13px;cursor:pointer;transition:all .15s;font-family:inherit}
+.btn:hover{transform:translateY(-1px)}
+.btn-amazon{background:var(--amber);color:#000}.btn-amazon:hover{background:#fbbf24}
+.btn-ebay{background:var(--blue);color:#fff}.btn-ebay:hover{background:#60a5fa}
+.btn-google{background:var(--ggreen);color:#000}.btn-google:hover{background:#6ee7b7}
+.btn-secondary{background:var(--s2);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+.btn-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.btn-grid .btn{font-size:11px;padding:8px 4px}
+.link-list{display:flex;flex-direction:column;gap:4px}
+.link-item{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--s2);border:1px solid var(--border);border-radius:8px;font-size:12px;cursor:pointer;transition:border .2s;text-decoration:none;color:var(--text)}
+.link-item:hover{border-color:var(--accent)}
+.link-arrow{color:var(--accent);font-size:10px}
+.main{overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:20px}
+.results-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.results-header h2{font-size:16px;font-weight:700}
+.result-count{font-size:12px;color:var(--muted)}
+.results-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;color:var(--muted);gap:12px;padding:60px}
+.empty-icon{font-size:48px;opacity:.3}.empty h3{font-size:18px;color:var(--text);font-weight:700}.empty p{font-size:13px;max-width:420px;line-height:1.6}
+.status{padding:4px 24px;background:var(--s1);border-top:1px solid var(--border);font-size:11px;color:var(--muted);grid-column:1/-1;display:flex;align-items:center;gap:12px}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--green)}.status.error .status-dot{background:var(--red)}
+.loading{display:none;align-items:center;gap:8px;font-size:12px;color:var(--accent)}.loading.active{display:flex}
+.spinner{width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.tab-bar{display:flex;border-bottom:1px solid var(--border);background:var(--s1);flex-shrink:0}
+.tab-btn{flex:1;padding:10px;background:none;border:none;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;font-family:inherit;transition:all .2s}
+.tab-btn.active{color:var(--amber);border-bottom-color:var(--amber)}.tab-btn:hover{color:var(--text)}
+.tab-content{display:none;flex-direction:column;overflow-y:auto;flex:1}.tab-content.active{display:flex}
+.deal-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--radius);padding:16px;transition:all .2s;cursor:pointer;text-decoration:none;color:var(--text);display:block}
+.deal-card:hover{border-color:var(--amber);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.deal-card.ebay:hover{border-color:var(--blue)}.deal-card.google:hover{border-color:var(--ggreen)}
+.deal-name{font-size:13px;font-weight:600;line-height:1.4;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.deal-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.deal-price{font-size:18px;font-weight:800;color:var(--green)}
+.deal-original{font-size:12px;color:var(--muted);text-decoration:line-through}
+.deal-discount{font-size:11px;font-weight:700;color:#000;background:var(--amber);padding:2px 8px;border-radius:4px}
+.deal-discount.ebay{background:var(--blue);color:#fff}.deal-discount.google{background:var(--ggreen);color:#000}
+.deal-badge{font-size:10px;font-weight:600;color:var(--accent);background:rgba(99,102,241,.15);padding:2px 8px;border-radius:4px}
+.deal-rating{font-size:11px;color:var(--amber)}.deal-reviews{font-size:10px;color:var(--muted)}
+.deal-link{font-size:10px;color:var(--accent2);margin-top:6px;display:block}
+.deal-store{font-size:10px;color:var(--muted);margin-top:2px}
+.mobile-toggle{display:none;background:none;border:none;cursor:pointer;padding:4px;flex-direction:column;gap:5px}
+.mobile-toggle span{display:block;width:22px;height:2px;background:var(--text);border-radius:2px;transition:all .3s}
+.mobile-toggle.active span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
+.mobile-toggle.active span:nth-child(2){opacity:0}
+.mobile-toggle.active span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
+@media(max-width:768px){
+  .app{grid-template-columns:1fr;grid-template-rows:56px 1fr 28px}
+  .sidebar{display:none;position:fixed;top:56px;left:0;right:0;bottom:28px;z-index:50}
+  .sidebar.open{display:flex}.mobile-toggle{display:flex}.results-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo">🏷️ Deal<span>Finder</span></div>
+    <div class="header-right">
+      <div class="loading" id="loading"><div class="spinner"></div>Scanning deals...</div>
+      <button class="mobile-toggle" id="mobileToggle" onclick="this.classList.toggle('active');document.querySelector('.sidebar').classList.toggle('open')"><span></span><span></span><span></span></button>
+    </div>
+  </header>
+
+  <div class="sidebar">
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('amazon')">🛒 Amazon</button>
+      <button class="tab-btn" onclick="switchTab('ebay')">🏪 eBay</button>
+      <button class="tab-btn" onclick="switchTab('google')">🔍 All Stores</button>
+    </div>
+
+    <!-- AMAZON -->
+    <div class="tab-content active" id="tab-amazon">
+      <div class="panel">
+        <div class="panel-title">Amazon Deal Finder</div>
+        <div class="input-group"><label>Search Deals</label><input type="text" id="amzQuery" placeholder="e.g. laptop, headphones, kitchen" value="laptop deals"></div>
+        <div class="input-group"><label>Max Results</label><input type="number" id="amzMax" value="30" min="5" max="60"></div>
+        <button class="btn btn-amazon" onclick="amzSearch()">🔍 Find Amazon Deals</button>
+        <div style="margin-top:8px"><button class="btn btn-secondary" onclick="amzGoldbox()" style="font-size:11px">⚡ Today's Deals (Goldbox)</button></div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Amazon Deal Pages</div>
+        <div class="link-list">
+          <a href="https://www.amazon.com/gp/goldbox" target="_blank" class="link-item"><span>🔥 Today's Deals</span><span class="link-arrow">→</span></a>
+          <a href="https://www.amazon.com/gp/bestsellers" target="_blank" class="link-item"><span>⭐ Best Sellers</span><span class="link-arrow">→</span></a>
+          <a href="https://www.amazon.com/gp/movers-and-shakers" target="_blank" class="link-item"><span>📈 Movers & Shakers</span><span class="link-arrow">→</span></a>
+          <a href="https://www.amazon.com/gp/new-releases" target="_blank" class="link-item"><span>🆕 New Releases</span><span class="link-arrow">→</span></a>
+          <a href="https://www.amazon.com/Amazon-Coupons/b?node=2231352011" target="_blank" class="link-item"><span>🎟️ Coupons</span><span class="link-arrow">→</span></a>
+          <a href="https://www.amazon.com/outlet" target="_blank" class="link-item"><span>🏪 Outlet</span><span class="link-arrow">→</span></a>
+          <a href="https://www.amazon.com/warehouse" target="_blank" class="link-item"><span>📦 Warehouse</span><span class="link-arrow">→</span></a>
+        </div>
+      </div>
+    </div>
+
+    <!-- EBAY -->
+    <div class="tab-content" id="tab-ebay">
+      <div class="panel">
+        <div class="panel-title">eBay Deal Finder</div>
+        <div class="input-group"><label>Search Deals</label><input type="text" id="ebayQuery" placeholder="e.g. laptop, iphone, sneakers" value="laptop"></div>
+        <div class="input-group"><label>Max Results</label><input type="number" id="ebayMax" value="30" min="5" max="60"></div>
+        <button class="btn btn-ebay" onclick="ebaySearch()">🔍 Find eBay Deals</button>
+        <div class="btn-grid">
+          <button class="btn btn-secondary" onclick="ebayDaily('daily_deals')">⚡ Daily</button>
+          <button class="btn btn-secondary" onclick="ebayDaily('tech_deals')">💻 Tech</button>
+          <button class="btn btn-secondary" onclick="ebayDaily('fashion_deals')">👗 Fashion</button>
+          <button class="btn btn-secondary" onclick="ebayDaily('home_deals')">🏠 Home</button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">eBay Deal Pages</div>
+        <div class="link-list">
+          <a href="https://www.ebay.com/deals" target="_blank" class="link-item"><span>🔥 Daily Deals</span><span class="link-arrow">→</span></a>
+          <a href="https://www.ebay.com/deals/tech" target="_blank" class="link-item"><span>💻 Tech</span><span class="link-arrow">→</span></a>
+          <a href="https://www.ebay.com/deals/fashion" target="_blank" class="link-item"><span>👗 Fashion</span><span class="link-arrow">→</span></a>
+          <a href="https://www.ebay.com/deals/home-and-garden" target="_blank" class="link-item"><span>🏠 Home</span><span class="link-arrow">→</span></a>
+          <a href="https://www.ebay.com/globaldeals" target="_blank" class="link-item"><span>🌍 Global</span><span class="link-arrow">→</span></a>
+        </div>
+      </div>
+    </div>
+
+    <!-- GOOGLE -->
+    <div class="tab-content" id="tab-google">
+      <div class="panel">
+        <div class="panel-title">All Stores Deal Finder</div>
+        <div class="input-group"><label>Search Product</label><input type="text" id="googleQuery" placeholder="e.g. airpods pro, ps5, nike shoes" value="airpods pro"></div>
+        <div class="input-group"><label>Max Results</label><input type="number" id="googleMax" value="30" min="5" max="60"></div>
+        <button class="btn btn-google" onclick="googleSearch()">🔍 Find Best Deals</button>
+        <p style="font-size:10px;color:var(--muted);margin-top:8px">Searches across Amazon, Walmart, Best Buy, Target, Costco, and more via Slickdeals.</p>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Shopping Sites</div>
+        <div class="link-list">
+          <a href="https://slickdeals.net" target="_blank" class="link-item"><span>💰 Slickdeals</span><span class="link-arrow">→</span></a>
+          <a href="https://slickdeals.net/deals/" target="_blank" class="link-item"><span>🔥 Frontpage Deals</span><span class="link-arrow">→</span></a>
+          <a href="https://slickdeals.net/deals/popular/" target="_blank" class="link-item"><span>📈 Popular Deals</span><span class="link-arrow">→</span></a>
+          <a href="https://camelcamelcamel.com" target="_blank" class="link-item"><span>🐫 CamelCamelCamel</span><span class="link-arrow">→</span></a>
+          <a href="https://slickdeals.net" target="_blank" class="link-item"><span>💰 Slickdeals</span><span class="link-arrow">→</span></a>
+          <a href="https://www.dealnews.com" target="_blank" class="link-item"><span>📰 DealNews</span><span class="link-arrow">→</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main" id="mainContent">
+    <div class="empty">
+      <div class="empty-icon">🏷️</div>
+      <h3>Deal Finder</h3>
+      <p>Search Amazon, eBay, or Google Shopping for the best deals sorted by biggest discount. Click any deal to go straight to the product page.</p>
+    </div>
+  </div>
+
+  <div class="status" id="statusBar"><div class="status-dot"></div><span id="statusText">Ready</span></div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+function setStatus(m,e=false){$('statusBar').className=e?'status error':'status';$('statusText').textContent=m}
+function setLoading(on){$('loading').className=on?'loading active':'loading'}
+function closeMobile(){document.querySelector('.sidebar').classList.remove('open');$('mobileToggle').classList.remove('active')}
+
+function switchTab(t){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  document.querySelector(`.tab-btn[onclick*="${t}"]`).classList.add('active');
+  $('tab-'+t).classList.add('active');
+}
+
+function renderDeals(deals,source='amazon'){
+  const main=$('mainContent');
+  if(!deals.length){main.innerHTML=`<div class="empty"><div class="empty-icon">🏷️</div><h3>No Deals Found</h3><p>Try a different search term.</p></div>`;return}
+  const withD=deals.filter(d=>d.discount_pct),withoutD=deals.filter(d=>!d.discount_pct);
+  const sorted=[...withD,...withoutD];
+  const labels={amazon:'Amazon',ebay:'eBay',google:'Google Shopping'};
+  const icons={amazon:'🛒',ebay:'🏪',google:'🔍'};
+  const label=labels[source]||source;
+  const icon=icons[source]||'';
+  const discClass='deal-discount'+(source!=='amazon'?' '+source:'');
+  const cardClass='deal-card'+(source!=='amazon'?' '+source:'');
+
+  main.innerHTML=`<div class="results-header"><h2>${icon} ${label} Deals</h2><span class="result-count">${deals.length} deals${withD.length?' · '+withD.length+' with discounts':''}</span></div>
+    <div class="results-grid">${sorted.map(d=>`
+      <a href="${d.url||'#'}" target="_blank" class="${cardClass}">
+        <div class="deal-name">${d.name||'Unknown'}</div>
+        <div class="deal-meta">
+          ${d.price_str?`<span class="deal-price">${d.price_str}</span>`:''}
+          ${d.original_price_str?`<span class="deal-original">${d.original_price_str}</span>`:''}
+          ${d.discount_pct?`<span class="${discClass}">${d.discount_pct}% OFF</span>`:''}
+          ${d.badge?`<span class="deal-badge">${d.badge}</span>`:''}
+        </div>
+        ${d.store?`<div class="deal-store">from ${d.store}</div>`:''}
+        <div class="deal-meta" style="margin-top:4px">
+          ${d.rating?`<span class="deal-rating">${'\u2605'.repeat(Math.round(d.rating))}${'\u2606'.repeat(5-Math.round(d.rating))} ${d.rating}</span>`:''}
+          ${d.reviews?`<span class="deal-reviews">(${d.reviews.toLocaleString()} reviews)</span>`:''}
+        </div>
+        <span class="deal-link">View ${source==='google'?'Deal':('on '+(d.store||label))} \u2192</span>
+      </a>`).join('')}</div>`;
+}
+
+async function api(endpoint,body){
+  setLoading(true);
+  try{const r=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const d=await r.json();if(!r.ok)throw new Error(d.error||'Failed');return d}
+  finally{setLoading(false)}
+}
+
+async function amzSearch(){const q=$('amzQuery').value.trim(),max=+$('amzMax').value||30;if(!q)return setStatus('Enter a search term',true);try{setStatus('🛒 Searching Amazon... (~15s)');closeMobile();const d=await api('/api/deals/search',{query:q,max_results:max});renderDeals(d.deals,'amazon');setStatus(`Found ${d.count} Amazon deals for "${q}"`)}catch(e){setStatus('Error: '+e.message,true)}}
+async function amzGoldbox(){try{setStatus("⚡ Loading Today's Deals... (~15s)");closeMobile();const d=await api('/api/deals/goldbox',{});renderDeals(d.deals,'amazon');setStatus(`Found ${d.count} Today's Deals`)}catch(e){setStatus('Error: '+e.message,true)}}
+async function ebaySearch(){const q=$('ebayQuery').value.trim(),max=+$('ebayMax').value||30;if(!q)return setStatus('Enter a search term',true);try{setStatus('🏪 Searching eBay... (~15s)');closeMobile();const d=await api('/api/deals/ebay/search',{query:q,max_results:max});renderDeals(d.deals,'ebay');setStatus(`Found ${d.count} eBay deals for "${q}"`)}catch(e){setStatus('Error: '+e.message,true)}}
+async function ebayDaily(page){try{setStatus('🏪 Loading eBay '+page.replace(/_/g,' ')+'... (~15s)');closeMobile();const d=await api('/api/deals/ebay',{page:page,max_results:30});renderDeals(d.deals,'ebay');setStatus(`Found ${d.count} eBay ${page.replace(/_/g,' ')}`)}catch(e){setStatus('Error: '+e.message,true)}}
+async function googleSearch(){const q=$('googleQuery').value.trim(),max=+$('googleMax').value||30;if(!q)return setStatus('Enter a search term',true);try{setStatus('🔍 Searching all stores... (~15s)');closeMobile();const d=await api('/api/deals/google',{query:q,max_results:max});renderDeals(d.deals,'google');setStatus(`Found ${d.count} deals for "${q}" across all stores`)}catch(e){setStatus('Error: '+e.message,true)}}
+
+$('amzQuery').addEventListener('keydown',e=>{if(e.key==='Enter')amzSearch()});
+$('ebayQuery').addEventListener('keydown',e=>{if(e.key==='Enter')ebaySearch()});
+$('googleQuery').addEventListener('keydown',e=>{if(e.key==='Enter')googleSearch()});
+</script>
+</body>
+</html>
