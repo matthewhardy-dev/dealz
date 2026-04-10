@@ -1,8 +1,15 @@
 """Deal Finder - Scrapes Amazon & eBay deals with prices, discounts, and direct links."""
+import os
 import re
 from urllib.parse import urljoin
 from bs4 import BeautifulSoup
-from playwright.sync_api import sync_playwright
+import requests
+
+try:
+    from playwright.sync_api import sync_playwright
+    HAS_PLAYWRIGHT = True
+except ImportError:
+    HAS_PLAYWRIGHT = False
 
 
 AMAZON_DEAL_PAGES = {
@@ -22,20 +29,33 @@ USER_AGENT = (
 )
 
 
+def _fetch_simple(url):
+    """Fallback fetcher using requests (no JS rendering)."""
+    headers = {"User-Agent": USER_AGENT, "Accept": "text/html,application/xhtml+xml", "Accept-Language": "en-US,en;q=0.9"}
+    res = requests.get(url, headers=headers, timeout=15)
+    res.raise_for_status()
+    return res.text
+
+
 def _fetch_page(url, scroll_count=4, wait_ms=2000):
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        page = browser.new_page(user_agent=USER_AGENT, viewport={"width": 1280, "height": 900})
-        page.goto(url, wait_until="domcontentloaded")
-        page.wait_for_timeout(wait_ms)
-        for i in range(scroll_count):
-            page.evaluate(f"window.scrollTo(0, document.body.scrollHeight * {(i+1)/scroll_count})")
-            page.wait_for_timeout(1500)
-        page.evaluate("window.scrollTo(0, 0)")
-        page.wait_for_timeout(500)
-        html = page.content()
-        browser.close()
-    return html
+    if not HAS_PLAYWRIGHT:
+        return _fetch_simple(url)
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True, args=["--no-sandbox", "--disable-dev-shm-usage"])
+            page = browser.new_page(user_agent=USER_AGENT, viewport={"width": 1280, "height": 900})
+            page.goto(url, wait_until="domcontentloaded", timeout=30000)
+            page.wait_for_timeout(wait_ms)
+            for i in range(scroll_count):
+                page.evaluate(f"window.scrollTo(0, document.body.scrollHeight * {(i+1)/scroll_count})")
+                page.wait_for_timeout(1500)
+            page.evaluate("window.scrollTo(0, 0)")
+            page.wait_for_timeout(500)
+            html = page.content()
+            browser.close()
+        return html
+    except Exception:
+        return _fetch_simple(url)
 
 
 def _parse_price(text):
