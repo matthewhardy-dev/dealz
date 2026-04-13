@@ -134,8 +134,8 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
   .sidebar{display:none;position:fixed;top:56px;left:0;right:0;bottom:28px;z-index:50;background:var(--s1)}
   .sidebar.open{display:flex}.mobile-toggle{display:flex}
   .results-grid{grid-template-columns:1fr}
-  .sort-bar{gap:4px;overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px}
-  .sort-btn{padding:5px 10px;font-size:10px;white-space:nowrap;flex-shrink:0}
+  .sort-bar{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding-bottom:4px}
+  .sort-btn{padding:10px 8px;font-size:12px;white-space:nowrap;text-align:center;min-height:40px}
   .sort-bar label{display:none}
   .tab-btn{font-size:10px;padding:10px 4px}
   .header-btn{padding:4px 6px;font-size:9px}
@@ -166,7 +166,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 @media(max-width:380px){
   .header-btn{padding:3px 5px;font-size:8px}
   .tab-btn{font-size:9px;padding:8px 2px}
-  .sort-btn{padding:4px 8px;font-size:9px}
+  .sort-btn{padding:8px 6px;font-size:11px;min-height:36px}
   .deal-price{font-size:14px}
 }
 </style>
