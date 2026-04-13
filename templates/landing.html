@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deal Finder Pro — Find the Best Deals Across the Internet</title>
+<meta name="description" content="Search Amazon, eBay, Walmart, and 10+ stores at once. Get price alerts, track price history, and never overpay again.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0f;--s1:#111118;--s2:#1a1a24;--border:#2a2a3a;--text:#e2e2ea;--muted:#6b6b80;--accent:#6366f1;--accent2:#818cf8;--green:#22c55e;--amber:#f59e0b;--blue:#3b82f6;--ggreen:#34d399}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
+a{color:var(--accent2);text-decoration:none}
+.container{max-width:1100px;margin:0 auto;padding:0 24px}
+
+/* Nav */
+nav{padding:16px 0;border-bottom:1px solid var(--border)}
+nav .container{display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-weight:900;font-size:20px;display:flex;align-items:center;gap:8px}
+.nav-logo span{color:var(--amber)}
+.nav-cta{background:var(--accent);color:#fff;padding:10px 24px;border-radius:8px;font-weight:700;font-size:14px;border:none;cursor:pointer;transition:all .15s;text-decoration:none}
+.nav-cta:hover{background:var(--accent2);transform:translateY(-1px)}
+
+/* Hero */
+.hero{padding:80px 0 60px;text-align:center}
+.hero-badge{display:inline-block;background:rgba(99,102,241,.15);color:var(--accent2);padding:6px 16px;border-radius:20px;font-size:12px;font-weight:700;margin-bottom:24px;letter-spacing:.5px}
+.hero h1{font-size:clamp(32px,5vw,56px);font-weight:900;line-height:1.1;margin-bottom:20px}
+.hero h1 em{font-style:normal;color:var(--amber)}
+.hero p{font-size:18px;color:var(--muted);max-width:600px;margin:0 auto 32px;line-height:1.6}
+.hero-buttons{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.hero-buttons .btn-primary{background:var(--accent);color:#fff;padding:14px 32px;border-radius:10px;font-weight:700;font-size:16px;border:none;cursor:pointer;transition:all .15s;text-decoration:none}
+.hero-buttons .btn-primary:hover{background:var(--accent2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(99,102,241,.3)}
+.hero-buttons .btn-secondary{background:var(--s2);color:var(--text);padding:14px 32px;border-radius:10px;font-weight:700;font-size:16px;border:1px solid var(--border);cursor:pointer;text-decoration:none}
+.hero-buttons .btn-secondary:hover{border-color:var(--accent)}
+
+/* Stats */
+.stats{display:flex;justify-content:center;gap:48px;padding:40px 0;flex-wrap:wrap}
+.stat{text-align:center}
+.stat-num{font-size:36px;font-weight:900;color:var(--green)}
+.stat-label{font-size:13px;color:var(--muted);margin-top:4px}
+
+/* Features */
+.features{padding:60px 0}
+.features h2{text-align:center;font-size:28px;font-weight:800;margin-bottom:48px}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+.feature-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:28px;transition:border .2s}
+.feature-card:hover{border-color:var(--accent)}
+.feature-icon{font-size:32px;margin-bottom:12px}
+.feature-card h3{font-size:16px;font-weight:700;margin-bottom:8px}
+.feature-card p{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* Stores */
+.stores{padding:40px 0;text-align:center}
+.stores h2{font-size:22px;font-weight:700;margin-bottom:24px;color:var(--muted)}
+.store-logos{display:flex;justify-content:center;gap:32px;flex-wrap:wrap;opacity:.6}
+.store-logos span{font-size:16px;font-weight:700;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<nav><div class="container">
+  <div class="nav-logo">🏷️ Deal<span>Finder</span> PRO</div>
+  <a href="/app" class="nav-cta">Open App →</a>
+</div></nav>
+
+<section class="hero"><div class="container">
+  <div class="hero-badge">🚀 10+ STORES · REAL-TIME ALERTS · PRICE TRACKING</div>
+  <h1>Never Overpay for <em>Anything</em> Again</h1>
+  <p>Search Amazon, eBay, Walmart, and dozens of other stores at once. Get instant price alerts, track price history, and find deals others miss.</p>
+  <div class="hero-buttons">
+    <a href="/app" class="btn-primary">Start Finding Deals — Free</a>
+    <a href="#pricing" class="btn-secondary">See Pricing</a>
+  </div>
+</div></section>
+
+<section class="stats"><div class="container" style="display:flex;justify-content:center;gap:48px;flex-wrap:wrap">
+  <div class="stat"><div class="stat-num">10+</div><div class="stat-label">Stores Searched</div></div>
+  <div class="stat"><div class="stat-num">1000s</div><div class="stat-label">Deals Found Daily</div></div>
+  <div class="stat"><div class="stat-num">99%</div><div class="stat-label">Max Discount Found</div></div>
+  <div class="stat"><div class="stat-num">24/7</div><div class="stat-label">Background Scanning</div></div>
+</div></section>
+
+<section class="features"><div class="container">
+  <h2>Everything You Need to Save Money</h2>
+  <div class="features-grid">
+    <div class="feature-card"><div class="feature-icon">🚀</div><h3>Deep Scan</h3><p>Search Amazon, eBay, Temu, AliExpress, Woot, Slickdeals, DealNews, TechBargains, and more — all at once. One click, every deal.</p></div>
+    <div class="feature-card"><div class="feature-icon">🔔</div><h3>Price Alerts</h3><p>Set a target price and get notified by email or text the moment it drops. Never miss a deal again.</p></div>
+    <div class="feature-card"><div class="feature-icon">📈</div><h3>Price History</h3><p>See how prices change over time. Know if you're getting a real deal or a fake "sale" with inflated original prices.</p></div>
+    <div class="feature-card"><div class="feature-icon">🔍</div><h3>Advanced Filters</h3><p>Filter by price range, minimum discount, condition (new/used/refurbished), and keywords. Find exactly what you want.</p></div>
+    <div class="feature-card"><div class="feature-icon">💰</div><h3>Smart Sorting</h3><p>Sort by cheapest, biggest discount, best rated, or most expensive. Results default to cheapest first.</p></div>
+    <div class="feature-card"><div class="feature-icon">❤️</div><h3>Wishlist & Saved Searches</h3><p>Save deals you're watching and searches you run often. One-click to re-run any saved search.</p></div>
+  </div>
+</div></section>
+
+<section class="stores"><div class="container">
+  <h2>Stores We Search</h2>
+  <div class="store-logos">
+    <span>Amazon</span><span>eBay</span><span>Walmart</span><span>Best Buy</span><span>Target</span>
+    <span>Costco</span><span>Woot</span><span>Temu</span><span>AliExpress</span><span>Newegg</span>
+    <span>Home Depot</span><span>Slickdeals</span><span>DealNews</span><span>TechBargains</span>
+  </div>
+</div></section>
+
+<section id="pricing" style="padding:60px 0"><div class="container" style="text-align:center">
+  <h2 style="font-size:28px;font-weight:800;margin-bottom:12px">Simple Pricing</h2>
+  <p style="color:var(--muted);margin-bottom:40px;font-size:15px">Start free. Upgrade when you need more power.</p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;max-width:960px;margin:0 auto">
+
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:32px;text-align:left">
+      <div style="font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700;margin-bottom:8px">Free</div>
+      <div style="font-size:36px;font-weight:900;margin-bottom:4px">$0<span style="font-size:14px;color:var(--muted);font-weight:400">/mo</span></div>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:20px;line-height:1.5">Perfect for casual deal hunters</p>
+      <ul style="list-style:none;font-size:13px;line-height:2.2">
+        <li>✅ Search all stores</li>
+        <li>✅ Sort & filter results</li>
+        <li>✅ 50 results per search</li>
+        <li>✅ Basic deal cards</li>
+        <li style="color:var(--muted)">❌ Price alerts</li>
+        <li style="color:var(--muted)">❌ Price history</li>
+        <li style="color:var(--muted)">❌ Deep Scan</li>
+      </ul>
+      <a href="/app" style="display:block;text-align:center;margin-top:20px;padding:12px;background:var(--s2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-weight:700;font-size:14px">Get Started</a>
+    </div>
+
+    <div style="background:var(--s1);border:2px solid var(--accent);border-radius:12px;padding:32px;text-align:left;position:relative">
+      <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:4px 16px;border-radius:12px;font-size:11px;font-weight:700">MOST POPULAR</div>
+      <div style="font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--accent2);font-weight:700;margin-bottom:8px">Pro</div>
+      <div style="font-size:36px;font-weight:900;margin-bottom:4px">$29<span style="font-size:14px;color:var(--muted);font-weight:400">/mo</span></div>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:20px;line-height:1.5">For serious bargain hunters</p>
+      <ul style="list-style:none;font-size:13px;line-height:2.2">
+        <li>✅ Everything in Free</li>
+        <li>✅ 500 results per search</li>
+        <li>✅ Deep Scan (10+ sites)</li>
+        <li>✅ Price alerts (email)</li>
+        <li>✅ Price history charts</li>
+        <li>✅ Wishlist & saved searches</li>
+        <li>✅ Advanced filters</li>
+      </ul>
+      <a href="/app" style="display:block;text-align:center;margin-top:20px;padding:12px;background:var(--accent);border-radius:8px;color:#fff;font-weight:700;font-size:14px">Start Pro Trial</a>
+    </div>
+
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:32px;text-align:left">
+      <div style="font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--amber);font-weight:700;margin-bottom:8px">Business</div>
+      <div style="font-size:36px;font-weight:900;margin-bottom:4px">$249<span style="font-size:14px;color:var(--muted);font-weight:400">/mo</span></div>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:20px;line-height:1.5">For resellers & procurement teams</p>
+      <ul style="list-style:none;font-size:13px;line-height:2.2">
+        <li>✅ Everything in Pro</li>
+        <li>✅ 1000+ results per search</li>
+        <li>✅ SMS + email alerts</li>
+        <li>✅ API access</li>
+        <li>✅ Background scanning 24/7</li>
+        <li>✅ Priority support</li>
+        <li>✅ Team accounts (5 users)</li>
+      </ul>
+      <a href="/app" style="display:block;text-align:center;margin-top:20px;padding:12px;background:var(--amber);border-radius:8px;color:#000;font-weight:700;font-size:14px">Contact Sales</a>
+    </div>
+
+  </div>
+</div></section>
+
+<footer style="padding:40px 0;border-top:1px solid var(--border);text-align:center">
+  <p style="color:var(--muted);font-size:12px">© 2026 Deal Finder Pro. All rights reserved.</p>
+</footer>
+
+</body>
+</html>

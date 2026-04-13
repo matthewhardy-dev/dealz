@@ -3,6 +3,8 @@ import json
 from flask import Flask, render_template, request, jsonify
 from database import db, init_db, Deal, PriceHistory, User, PriceAlert, SavedSearch, Wishlist, cache_deals, get_price_history, check_alerts
 from notifications import process_alerts
+from affiliate import tag_deals_list
+from api_integrations import search_with_api_fallback, amazon_api_available, ebay_api_available, walmart_api_available
 from smartscraper.deals import (
     scrape_search_deals, scrape_goldbox_deals, get_deal_pages,
     scrape_ebay_deals, scrape_ebay_search_deals, EBAY_DEAL_PAGES,
@@ -16,6 +18,14 @@ os.makedirs(MODELS_DIR, exist_ok=True)
 
 # Initialize database
 init_db(app)
+
+# Start background scheduler (only in main process, not reloader)
+if not os.environ.get("WERKZEUG_RUN_MAIN") or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+    try:
+        from scheduler import init_scheduler
+        init_scheduler(app)
+    except Exception as e:
+        print(f"[Scheduler] Failed to start: {e}")
 
 
 def _get_filters(data):
@@ -41,7 +51,8 @@ def _get_filters(data):
 
 
 def _cache_and_alert(deals, query="", source=""):
-    """Cache deals and check for triggered alerts."""
+    """Cache deals, tag affiliate links, and check for triggered alerts."""
+    deals = tag_deals_list(deals)
     try:
         cache_deals(deals, query, source)
         triggered = check_alerts(deals)
@@ -49,6 +60,7 @@ def _cache_and_alert(deals, query="", source=""):
             process_alerts(triggered)
     except Exception as e:
         print(f"[Cache/Alert error] {e}")
+    return deals
 
 
 # ============================================================
@@ -56,6 +68,11 @@ def _cache_and_alert(deals, query="", source=""):
 # ============================================================
 
 @app.route("/")
+def landing():
+    return render_template("landing.html")
+
+
+@app.route("/app")
 def index():
     return render_template("index.html")
 
@@ -72,12 +89,14 @@ def api_deals_search():
     sort_by = data.get("sort_by", "cheapest")
     filters = _get_filters(data)
     try:
-        if max_results > 60:
-            deals = scrape_amazon_comprehensive(query, max_results, filters=filters, sort_by=sort_by)
-        else:
-            deals = scrape_search_deals(query, max_results, filters=filters, sort_by=sort_by)
-        _cache_and_alert(deals, query, "amazon")
-        return jsonify({"deals": deals, "count": len(deals)})
+        # Try Amazon API first, fall back to scraping
+        deals, method = search_with_api_fallback(
+            "amazon", query, max_results,
+            scrape_func=scrape_amazon_comprehensive if max_results > 60 else scrape_search_deals,
+            filters=filters, sort_by=sort_by
+        )
+        deals = _cache_and_alert(deals, query, "amazon")
+        return jsonify({"deals": deals, "count": len(deals), "method": method})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -341,9 +360,13 @@ def api_config_status():
     return jsonify({
         "email": bool(os.environ.get("SMTP_HOST")),
         "sms": bool(os.environ.get("TWILIO_SID")),
-        "amazon_api": bool(os.environ.get("AMAZON_ACCESS_KEY")),
-        "ebay_api": bool(os.environ.get("EBAY_APP_ID")),
-        "walmart_api": bool(os.environ.get("WALMART_API_KEY")),
+        "amazon_api": amazon_api_available(),
+        "ebay_api": ebay_api_available(),
+        "walmart_api": walmart_api_available(),
+        "amazon_affiliate": bool(os.environ.get("AMAZON_ASSOCIATE_TAG")),
+        "ebay_affiliate": bool(os.environ.get("EBAY_CAMPAIGN_ID")),
+        "walmart_affiliate": bool(os.environ.get("WALMART_AFFILIATE_ID")),
+        "scheduler": True,
     })
 
 
