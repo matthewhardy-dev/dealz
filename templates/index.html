@@ -68,6 +68,14 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 .sort-btn:hover{border-color:var(--accent);color:var(--text)}
 .sort-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
 .results-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+/* Pagination */
+.pagination{display:flex;align-items:center;justify-content:center;gap:6px;padding:16px 0;flex-wrap:wrap}
+.page-btn{padding:8px 14px;border:1px solid var(--border);background:var(--s2);color:var(--muted);border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;min-height:36px}
+.page-btn:hover:not(.disabled){border-color:var(--accent);color:var(--text)}
+.page-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.page-btn.disabled{opacity:.3;cursor:default}
+.page-info{font-size:12px;color:var(--muted);margin-right:8px}
+.page-dots{color:var(--muted);font-size:12px;padding:0 4px}
 .empty{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;color:var(--muted);gap:12px;padding:60px}
 .empty-icon{font-size:48px;opacity:.3}.empty h3{font-size:18px;color:var(--text);font-weight:700}
 .empty p{font-size:13px;max-width:480px;line-height:1.7}
@@ -387,25 +395,34 @@ function clearFilters(p){['MustContain','Exclude','MinPrice','MaxPrice','MinDisc
 function getFilters(p){const f={},v=id=>$(p+id)?.value||'';if(v('MinPrice'))f.min_price=v('MinPrice');if(v('MaxPrice'))f.max_price=v('MaxPrice');if(v('MinDiscount'))f.min_discount=v('MinDiscount');const c=v('Condition');if(c&&c!=='any')f.condition=c;if(v('MustContain'))f.must_contain=v('MustContain');if(v('Exclude'))f.exclude=v('Exclude');return f}
 
 // ---- Sort ----
-function setSort(s){currentSort=s;document.querySelectorAll('.sort-btn').forEach(b=>b.classList.remove('active'));document.querySelector(`.sort-btn[data-sort="${s}"]`)?.classList.add('active');if(currentDeals.length)renderDealCards(sortDeals(currentDeals,s),currentSource)}
+let currentPage = 1;
+const DEALS_PER_PAGE = 50;
+function setSort(s){currentSort=s;currentPage=1;document.querySelectorAll('.sort-btn').forEach(b=>b.classList.remove('active'));document.querySelector(`.sort-btn[data-sort="${s}"]`)?.classList.add('active');if(currentDeals.length){renderDealCards(sortDeals(currentDeals,s),currentSource);renderPagination()}}
 function sortDeals(d,s){const c=[...d];switch(s){case'cheapest':return c.sort((a,b)=>(a.price||99999)-(b.price||99999));case'expensive':return c.sort((a,b)=>(b.price||0)-(a.price||0));case'discount':return c.sort((a,b)=>(b.discount_pct||0)-(a.discount_pct||0));case'rating':return c.sort((a,b)=>(b.rating||0)-(a.rating||0));default:return c}}
 
 // ---- Render ----
 function renderDeals(deals,source,requested){
   // Filter out deals without a price
   deals = deals.filter(d => d.price && d.price > 0);
-  currentDeals=deals;currentSource=source;const sorted=sortDeals(deals,currentSort),m=$('mainContent'),o=$('loadingOverlay'),withD=deals.filter(d=>d.discount_pct);m.innerHTML='';m.appendChild(o);
+  currentDeals=deals;currentSource=source;currentPage=1;const sorted=sortDeals(deals,currentSort),m=$('mainContent'),o=$('loadingOverlay'),withD=deals.filter(d=>d.discount_pct);m.innerHTML='';m.appendChild(o);
 if(!deals.length){m.innerHTML+='<div class="empty"><div class="empty-icon">😕</div><h3>No Deals Found</h3><p>Try different terms, remove filters, or increase results.</p></div>';return}
 const reqText = requested && requested > deals.length ? `${deals.length} of ${requested} requested` : `${deals.length} found`;
 const h=document.createElement('div');h.className='results-header';h.innerHTML=`<h2>${ICONS[source]||''} ${TABS[source]||source} Deals</h2><span class="result-count">${reqText}${withD.length?' · '+withD.length+' with discounts':''}</span>`;m.appendChild(h);
 const sb=document.createElement('div');sb.className='sort-bar';sb.innerHTML=`<label>Sort:</label><button class="sort-btn${currentSort==='cheapest'?' active':''}" data-sort="cheapest" onclick="setSort('cheapest')">💰 Cheapest</button><button class="sort-btn${currentSort==='expensive'?' active':''}" data-sort="expensive" onclick="setSort('expensive')">💎 Priciest</button><button class="sort-btn${currentSort==='discount'?' active':''}" data-sort="discount" onclick="setSort('discount')">🔥 Discount</button><button class="sort-btn${currentSort==='rating'?' active':''}" data-sort="rating" onclick="setSort('rating')">⭐ Rated</button>`;m.appendChild(sb);
 if(currentUser){const sv=document.createElement('button');sv.className='btn btn-secondary btn-sm';sv.style.cssText='width:auto;margin-top:4px';sv.textContent='💾 Save This Search';sv.onclick=()=>saveSearch();m.appendChild(sv)}
-const g=document.createElement('div');g.className='results-grid';g.id='dealsGrid';m.appendChild(g);renderDealCards(sorted,source);history.pushState({source,tab:currentTab,sort:currentSort},'','#'+source)}
+const g=document.createElement('div');g.className='results-grid';g.id='dealsGrid';m.appendChild(g);
+const pg=document.createElement('div');pg.className='pagination';pg.id='pagination';m.appendChild(pg);
+renderDealCards(sorted,source);renderPagination();history.pushState({source,tab:currentTab,sort:currentSort},'','#'+source)}
 
-function renderDealCards(deals,source){const g=$('dealsGrid');if(!g)return;const dc='deal-discount'+(source!=='amazon'?' '+source:''),cc='deal-card'+(source!=='amazon'?' '+source:'');
-g.innerHTML=deals.map((d,i)=>{const cn=(d.condition||'new').toLowerCase().replace(/\s+/g,'');let sv='';if(d.price&&d.original_price&&d.original_price>d.price)sv=`<span class="deal-savings">You save $${(d.original_price-d.price).toFixed(2)}</span>`;
-return`<a href="${d.url||'#'}" target="_blank" class="${cc}" data-idx="${i}">
-<button class="deal-wishlist" onclick="event.preventDefault();event.stopPropagation();addToWishlist(${i})" title="Add to Wishlist">♡</button>
+function goToPage(p){const tp=Math.ceil(currentDeals.length/DEALS_PER_PAGE);if(p<1||p>tp)return;currentPage=p;renderDealCards(sortDeals(currentDeals,currentSort),currentSource);renderPagination();$('mainContent').scrollTo({top:0,behavior:'smooth'})}
+function renderPagination(){const pg=$('pagination');if(!pg)return;const t=currentDeals.length,tp=Math.ceil(t/DEALS_PER_PAGE);if(tp<=1){pg.innerHTML='';return}const s=(currentPage-1)*DEALS_PER_PAGE+1,e=Math.min(currentPage*DEALS_PER_PAGE,t);let h=`<span class="page-info">Showing ${s}-${e} of ${t}</span>`;h+=`<button class="page-btn${currentPage===1?' disabled':''}" onclick="goToPage(${currentPage-1})" ${currentPage===1?'disabled':''}>Prev</button>`;for(let i=1;i<=tp;i++){if(tp<=7||i===1||i===tp||Math.abs(i-currentPage)<=1){h+=`<button class="page-btn${i===currentPage?' active':''}" onclick="goToPage(${i})">${i}</button>`}else if((i===2&&currentPage>4)||(i===tp-1&&currentPage<tp-3)){h+='<span class="page-dots">...</span>'}}h+=`<button class="page-btn${currentPage===tp?' disabled':''}" onclick="goToPage(${currentPage+1})" ${currentPage===tp?'disabled':''}>Next</button>`;pg.innerHTML=h}
+
+function renderDealCards(deals,source){const g=$('dealsGrid');if(!g)return;
+const start=(currentPage-1)*DEALS_PER_PAGE,pageDeals=deals.slice(start,start+DEALS_PER_PAGE);
+const dc='deal-discount'+(source!=='amazon'?' '+source:''),cc='deal-card'+(source!=='amazon'?' '+source:'');
+g.innerHTML=pageDeals.map((d,i)=>{const idx=start+i;const cn=(d.condition||'new').toLowerCase().replace(/\s+/g,'');let sv='';if(d.price&&d.original_price&&d.original_price>d.price)sv=`<span class="deal-savings">You save $${(d.original_price-d.price).toFixed(2)}</span>`;
+return`<a href="${d.url||'#'}" target="_blank" class="${cc}" data-idx="${idx}">
+<button class="deal-wishlist" onclick="event.preventDefault();event.stopPropagation();addToWishlist(${idx})" title="Add to Wishlist">♡</button>
 <div class="deal-name">${escHtml(d.name||'Unknown')}</div>
 <div class="deal-meta">${d.price_str?`<span class="deal-price">${d.price_str}</span>`:''}${d.original_price_str?`<span class="deal-original">${d.original_price_str}</span>`:''}${d.discount_pct?`<span class="${dc}">${d.discount_pct}% OFF</span>`:''}</div>
 ${sv?`<div style="margin-top:2px">${sv}</div>`:''}
