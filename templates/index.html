@@ -106,15 +106,15 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 .deal-rating{font-size:11px;color:var(--amber)}.deal-reviews{font-size:10px;color:var(--muted)}
 .deal-link{font-size:10px;color:var(--accent2);margin-top:6px;display:block}
 .deal-store{font-size:10px;color:var(--muted);margin-top:2px}
-.deal-wishlist{position:absolute;top:12px;right:12px;background:none;border:none;font-size:18px;cursor:pointer;opacity:.4;transition:all .15s;padding:0}
+.deal-wishlist{position:absolute;top:8px;right:8px;background:none;border:none;font-size:18px;cursor:pointer;opacity:.4;transition:all .15s;padding:4px;min-height:36px;min-width:36px;display:flex;align-items:center;justify-content:center}
 .deal-wishlist:hover{opacity:1;transform:scale(1.2)}
 .deal-wishlist.saved{opacity:1;color:var(--red)}
 /* Modal */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center;padding:16px;overflow-y:auto}
 .modal-overlay.active{display:flex}
-.modal{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:24px;max-width:480px;width:90%;max-height:80vh;overflow-y:auto}
+.modal{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:24px;max-width:480px;width:100%;max-height:80vh;overflow-y:auto}
 .modal h3{font-size:16px;font-weight:700;margin-bottom:16px}
-.modal-close{float:right;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer}
+.modal-close{float:right;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:4px 8px;min-height:44px;min-width:44px;display:flex;align-items:center;justify-content:center}
 .modal-close:hover{color:var(--text)}
 /* Alert/saved items */
 .item-card{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
@@ -133,9 +133,40 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
   .sidebar{display:none;position:fixed;top:56px;left:0;right:0;bottom:28px;z-index:50;background:var(--s1)}
   .sidebar.open{display:flex}.mobile-toggle{display:flex}
   .results-grid{grid-template-columns:1fr}
-  .sort-bar{gap:4px}.sort-btn{padding:5px 8px;font-size:10px}
+  .sort-bar{gap:4px;overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px}
+  .sort-btn{padding:5px 10px;font-size:10px;white-space:nowrap;flex-shrink:0}
+  .sort-bar label{display:none}
+  .tab-btn{font-size:10px;padding:10px 4px}
+  .header-btn{padding:4px 6px;font-size:9px}
+  .header-btn .btn-label{display:none}
+  .modal{max-width:95%;max-height:85vh;padding:16px;margin:8px}
+  .modal h3{font-size:14px}
+  .input-row{grid-template-columns:1fr}
+  .deal-card{padding:12px}
+  .deal-name{font-size:12px;padding-right:28px}
+  .deal-price{font-size:16px}
+  .deal-meta{gap:6px}
+  .loading-text{font-size:13px}
+  .loading-sub{font-size:11px;padding:0 16px}
+  .main{padding:16px}
+  .results-header{flex-direction:column;align-items:flex-start;gap:4px}
+  .results-header h2{font-size:14px}
+  .empty{padding:30px 16px}
+  .empty-icon{font-size:36px}
+  .empty h3{font-size:16px}
+  .empty p{font-size:12px}
+  .empty-tips li{font-size:11px}
+  .panel-desc{font-size:10px}
+  .item-card{flex-direction:column;align-items:flex-start;gap:8px}
+  .item-card .actions{width:100%;justify-content:flex-end}
+  .btn-grid{grid-template-columns:1fr 1fr}
+  .adv-panel .input-row{grid-template-columns:1fr 1fr}
+}
+@media(max-width:380px){
+  .header-btn{padding:3px 5px;font-size:8px}
   .tab-btn{font-size:9px;padding:8px 2px}
-  .header-btn{padding:4px 8px;font-size:10px}
+  .sort-btn{padding:4px 8px;font-size:9px}
+  .deal-price{font-size:14px}
 }
 </style>
 <body>
@@ -143,9 +174,9 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
   <header>
     <div class="logo">🏷️ Deal<span>Finder</span> <span style="font-size:10px;color:var(--accent);font-weight:600;margin-left:4px">PRO</span></div>
     <div class="header-right">
-      <button class="header-btn" onclick="openModal('accountModal')" id="accountBtn">👤 Sign In</button>
-      <button class="header-btn" onclick="openModal('alertsModal')">🔔 Alerts</button>
-      <button class="header-btn" onclick="openModal('wishlistModal')">❤️ Wishlist</button>
+      <button class="header-btn" onclick="openModal('accountModal')" id="accountBtn">👤 <span class="btn-label">Sign In</span></button>
+      <button class="header-btn" onclick="openModal('alertsModal')">🔔 <span class="btn-label">Alerts</span></button>
+      <button class="header-btn" onclick="openModal('wishlistModal')">❤️ <span class="btn-label">Wishlist</span></button>
       <button class="mobile-toggle" id="mobileToggle" onclick="this.classList.toggle('active');document.querySelector('.sidebar').classList.toggle('open')"><span></span><span></span><span></span></button>
     </div>
   </header>
@@ -386,7 +417,7 @@ async function deepScanQuick(p){$('deepMinDiscount').value=p;$('deepQuery').valu
 
 // ---- User Account ----
 function loadUserFromStorage(){const u=localStorage.getItem('dfp_user');if(u){currentUser=JSON.parse(u);updateAccountUI()}}
-function updateAccountUI(){if(currentUser){$('accountBtn').textContent='👤 '+( currentUser.name||currentUser.email||'Account');$('accountForm').style.display='none';$('accountInfo').style.display='block';$('accountName').textContent=currentUser.name||'No name';$('accountEmail').textContent=currentUser.email||'No email';$('accountPhone').textContent=currentUser.phone||'No phone';loadSavedSearches()}else{$('accountBtn').textContent='👤 Sign In';$('accountForm').style.display='block';$('accountInfo').style.display='none'}}
+function updateAccountUI(){if(currentUser){$('accountBtn').innerHTML='👤 <span class="btn-label">'+( currentUser.name||currentUser.email||'Account')+'</span>';$('accountForm').style.display='none';$('accountInfo').style.display='block';$('accountName').textContent=currentUser.name||'No name';$('accountEmail').textContent=currentUser.email||'No email';$('accountPhone').textContent=currentUser.phone||'No phone';loadSavedSearches()}else{$('accountBtn').innerHTML='👤 <span class="btn-label">Sign In</span>';$('accountForm').style.display='block';$('accountInfo').style.display='none'}}
 function loadAccount(){updateAccountUI()}
 async function registerUser(){const email=$('userEmail').value.trim(),phone=$('userPhone').value.trim(),name=$('userName').value.trim();if(!email&&!phone)return alert('Enter an email or phone number');try{const r=await api('/api/user/register',{email,phone,name});currentUser=r.user;localStorage.setItem('dfp_user',JSON.stringify(currentUser));updateAccountUI();setStatus(r.message)}catch(e){alert('Error: '+e.message)}}
 function signOut(){currentUser=null;localStorage.removeItem('dfp_user');updateAccountUI()}
