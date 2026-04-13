@@ -41,8 +41,16 @@ PER_UNIT_RE = re.compile(r"\$[\d.]+\s*/\s*(?:sq|square|linear|cubic)?\s*(?:ft|fo
 
 def _fetch_simple(url):
     headers = {"User-Agent": USER_AGENT, "Accept": "text/html,application/xhtml+xml", "Accept-Language": "en-US,en;q=0.9"}
-    res = requests.get(url, headers=headers, timeout=15)
-    res.raise_for_status()
+    for attempt in range(3):
+        try:
+            res = requests.get(url, headers=headers, timeout=25)
+            res.raise_for_status()
+            return res.text
+        except Exception:
+            if attempt == 2:
+                raise
+            import time
+            time.sleep(2)
     return res.text
 
 
@@ -53,7 +61,7 @@ def _fetch_page(url, scroll_count=4, wait_ms=2000):
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True, args=["--no-sandbox", "--disable-dev-shm-usage"])
             page = browser.new_page(user_agent=USER_AGENT, viewport={"width": 1280, "height": 900})
-            page.goto(url, wait_until="domcontentloaded", timeout=30000)
+            page.goto(url, wait_until="domcontentloaded", timeout=45000)
             page.wait_for_timeout(wait_ms)
             for i in range(scroll_count):
                 page.evaluate(f"window.scrollTo(0, document.body.scrollHeight * {(i+1)/scroll_count})")
