@@ -3,3 +3,6 @@ __pycache__/
 *.pyo
 models/_session.json
 .env
+*.pem
+*.db
+.vscode/

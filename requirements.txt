@@ -2,5 +2,7 @@ requests
 beautifulsoup4
 lxml
 flask
+flask-sqlalchemy
 playwright
 gunicorn
+twilio
