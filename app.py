@@ -108,7 +108,7 @@ def api_deals_goldbox():
     filters = _get_filters(data)
     try:
         deals = scrape_goldbox_deals(filters=filters, sort_by=sort_by)
-        _cache_and_alert(deals, "goldbox", "amazon")
+        deals = _cache_and_alert(deals, "goldbox", "amazon")
         return jsonify({"deals": deals, "count": len(deals)})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -128,7 +128,7 @@ def api_ebay_deals():
     filters = _get_filters(data)
     try:
         deals = scrape_ebay_deals(url, max_results=data.get("max_results", 30), filters=filters, sort_by=sort_by)
-        _cache_and_alert(deals, page, "ebay")
+        deals = _cache_and_alert(deals, page, "ebay")
         return jsonify({"deals": deals, "count": len(deals)})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -146,7 +146,7 @@ def api_ebay_search():
             deals = scrape_ebay_comprehensive(query, max_results, filters=filters, sort_by=sort_by)
         else:
             deals = scrape_ebay_search_deals(query, max_results=max_results, filters=filters, sort_by=sort_by)
-        _cache_and_alert(deals, query, "ebay")
+        deals = _cache_and_alert(deals, query, "ebay")
         return jsonify({"deals": deals, "count": len(deals)})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -162,7 +162,7 @@ def api_google_deals():
     filters = _get_filters(data)
     try:
         deals = scrape_multi_store_deals(query, max_results=data.get("max_results", 30), filters=filters, sort_by=sort_by)
-        _cache_and_alert(deals, query, "slickdeals")
+        deals = _cache_and_alert(deals, query, "slickdeals")
         return jsonify({"deals": deals, "count": len(deals)})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -177,7 +177,12 @@ def api_deep_scan():
     sort_by = data.get("sort_by", "cheapest")
     try:
         deals = deep_scan_deals(query=query, min_discount=min_discount, max_results=max_results, sort_by=sort_by)
-        _cache_and_alert(deals, query, "deepscan")
+        deals = _cache_and_alert(deals, query, "deepscan")
+        # If min_discount filtered everything out, retry without discount filter
+        if not deals and min_discount > 0:
+            deals = deep_scan_deals(query=query, min_discount=0, max_results=max_results, sort_by=sort_by)
+            deals = _cache_and_alert(deals, query, "deepscan")
+            return jsonify({"deals": deals, "count": len(deals), "note": f"No deals found at {min_discount}%+ off. Showing all deals instead."})
         return jsonify({"deals": deals, "count": len(deals)})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
